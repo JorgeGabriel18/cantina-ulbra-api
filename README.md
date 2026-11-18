@@ -20,7 +20,7 @@ API REST desenvolvida em Node.js para gerenciamento de produtos, pedidos e relat
 1. Clone o repositório:
 
 ```bash
-git clone URL_DO_REPOSITORIO
+git clone https://github.com/JorgeGabriel18/cantina-ulbra-api.git
 ```
 
 2. Entre na pasta do projeto:
@@ -63,7 +63,13 @@ http://localhost:3000
 cantina-ulbra-api/
 ├── src/
 │   ├── controllers/
+│   │   ├── produtosController.js
+│   │   ├── pedidosController.js
+│   │   └── relatoriosController.js
 │   ├── routes/
+│   │   ├── produtosRoutes.js
+│   │   ├── pedidosRoutes.js
+│   │   └── relatoriosRoutes.js
 │   ├── database/
 │   │   ├── migrations/
 │   │   ├── seeds/
@@ -156,7 +162,16 @@ GET /api/relatorios/faturamento?inicio=2026-11-10&fim=2026-11-14
 ```
 
 As datas devem utilizar o formato `YYYY-MM-DD`.
+## Códigos HTTP
 
+| Código | Descrição |
+|---|---|
+| 200 | Operação realizada com sucesso |
+| 201 | Registro criado com sucesso |
+| 400 | Dados inválidos ou requisição incorreta |
+| 404 | Registro não encontrado |
+| 409 | Conflito ou estoque insuficiente |
+| 500 | Erro interno do servidor |
 ## Regras de negócio
 
 - O valor total dos pedidos é calculado utilizando o preço do produto armazenado no banco de dados.
