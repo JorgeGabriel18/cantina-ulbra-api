@@ -1,0 +1,6 @@
+node_modules/
+
+src/database/cantina.sqlite3
+src/database/cantina.sqlite3-journal
+
+.env
