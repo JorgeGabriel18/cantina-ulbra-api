@@ -1,4 +1,3 @@
-
 # API Cantina ULBRA
 
 API REST desenvolvida em Node.js para gerenciamento de produtos, pedidos e relatórios de vendas da cantina ULBRA.
@@ -88,7 +87,7 @@ cantina-ulbra-api/
 
 ## Endpoints
 
-### Produtos
+### 1. Produtos
 
 | Método | Rota | Descrição |
 |---|---|---|
@@ -98,21 +97,74 @@ cantina-ulbra-api/
 | PUT | /api/produtos/:id | Atualizar produto |
 | DELETE | /api/produtos/:id | Excluir produto |
 
-Filtros disponíveis:
+#### GET /api/produtos
 
-- `categoria`: filtra pela categoria do produto.
+Lista todos os produtos.
+
+Filtros opcionais:
+
+- `categoria`: filtra pela categoria.
 - `ativo`: filtra produtos ativos ou inativos.
 
-Exemplos:
+Exemplos de requisição:
 
 ```text
 GET /api/produtos
 GET /api/produtos?categoria=Lanches
 GET /api/produtos?ativo=true
+```
+
+Exemplo de resposta:
+
+```json
+[
+    {
+        "id": 1,
+        "nome": "X-Burguer",
+        "categoria": "Lanches",
+        "preco": 15,
+        "estoque": 28,
+        "ativo": 1
+    },
+    {
+        "id": 2,
+        "nome": "X-Salada",
+        "categoria": "Lanches",
+        "preco": 18,
+        "estoque": 23,
+        "ativo": 1
+    }
+]
+```
+
+#### GET /api/produtos/:id
+
+Busca um produto específico pelo ID.
+
+Requisição:
+
+```text
 GET /api/produtos/1
 ```
 
-Exemplo de cadastro:
+Exemplo de resposta:
+
+```json
+{
+    "id": 1,
+    "nome": "X-Burguer",
+    "categoria": "Lanches",
+    "preco": 15,
+    "estoque": 28,
+    "ativo": 1
+}
+```
+
+#### POST /api/produtos
+
+Cadastra um novo produto.
+
+Requisição:
 
 ```json
 {
@@ -123,7 +175,7 @@ Exemplo de cadastro:
 }
 ```
 
-Exemplo de resposta:
+Exemplo de resposta (201):
 
 ```json
 {
@@ -136,7 +188,60 @@ Exemplo de resposta:
 }
 ```
 
-### Pedidos
+#### PUT /api/produtos/:id
+
+Atualiza os dados de um produto, incluindo seu estado ativo.
+
+Requisição:
+
+```text
+PUT /api/produtos/1
+```
+
+Corpo da requisição:
+
+```json
+{
+    "nome": "X-Burguer Especial",
+    "categoria": "Lanches",
+    "preco": 18.00,
+    "estoque": 30,
+    "ativo": true
+}
+```
+
+Exemplo de resposta:
+
+```json
+{
+    "id": 1,
+    "nome": "X-Burguer Especial",
+    "categoria": "Lanches",
+    "preco": 18,
+    "estoque": 30,
+    "ativo": 1
+}
+```
+
+#### DELETE /api/produtos/:id
+
+Exclui um produto que não possui histórico de pedidos.
+
+Requisição:
+
+```text
+DELETE /api/produtos/7
+```
+
+Exemplo de resposta:
+
+```text
+Status: 204 No Content
+```
+
+Produtos que possuem pedidos vinculados não podem ser excluídos e retornam status 409.
+
+### 2. Pedidos
 
 | Método | Rota | Descrição |
 |---|---|---|
@@ -145,17 +250,65 @@ Exemplo de resposta:
 | POST | /api/pedidos | Criar pedido |
 | DELETE | /api/pedidos/:id | Excluir pedido |
 
-A listagem utiliza paginação obrigatória com `limit` e `offset`, além do filtro opcional `aluno`.
+#### GET /api/pedidos
 
-Exemplos:
+Lista os pedidos utilizando paginação obrigatória com `limit` e `offset`.
+
+Também permite filtrar pelo nome do aluno utilizando `aluno`.
+
+Requisições:
 
 ```text
 GET /api/pedidos?limit=10&offset=0
-GET /api/pedidos?limit=10&offset=0&aluno=Carlos
+GET /api/pedidos?limit=10&offset=0&aluno=João
+```
+
+Exemplo de resposta:
+
+```json
+[
+    {
+        "id": 1,
+        "aluno_nome": "João Silva",
+        "produto_id": 1,
+        "quantidade": 2,
+        "valor_total": 30,
+        "created_at": "2026-11-10 10:00:00",
+        "updated_at": "2026-11-10 10:00:00"
+    }
+]
+```
+
+#### GET /api/pedidos/:id
+
+Busca um pedido específico e utiliza JOIN para retornar também o nome do produto.
+
+Requisição:
+
+```text
 GET /api/pedidos/1
 ```
 
-Exemplo de criação:
+Exemplo de resposta:
+
+```json
+{
+    "id": 1,
+    "aluno_nome": "João Silva",
+    "produto_id": 1,
+    "quantidade": 2,
+    "valor_total": 30,
+    "produto_nome": "X-Burguer",
+    "created_at": "2026-11-10 10:00:00",
+    "updated_at": "2026-11-10 10:00:00"
+}
+```
+
+#### POST /api/pedidos
+
+Cria um pedido e reduz automaticamente o estoque do produto.
+
+Requisição:
 
 ```json
 {
@@ -165,7 +318,7 @@ Exemplo de criação:
 }
 ```
 
-Exemplo de resposta:
+Exemplo de resposta (201):
 
 ```json
 {
@@ -177,9 +330,25 @@ Exemplo de resposta:
 }
 ```
 
-O valor total é calculado automaticamente pela API, utilizando o preço cadastrado no banco de dados.
+O valor total é calculado pela API utilizando o preço cadastrado no banco de dados, sem considerar um possível valor enviado pelo cliente.
 
-### Relatórios
+#### DELETE /api/pedidos/:id
+
+Exclui um pedido e devolve a quantidade correspondente ao estoque do produto.
+
+Requisição:
+
+```text
+DELETE /api/pedidos/1
+```
+
+Exemplo de resposta:
+
+```text
+Status: 204 No Content
+```
+
+### 3. Relatórios
 
 | Método | Rota | Descrição |
 |---|---|---|
@@ -187,7 +356,11 @@ O valor total é calculado automaticamente pela API, utilizando o preço cadastr
 | GET | /api/relatorios/top-produtos | Cinco produtos mais vendidos |
 | GET | /api/relatorios/faturamento | Faturamento por período |
 
-Exemplo de vendas por categoria:
+#### GET /api/relatorios/vendas-por-categoria
+
+Retorna o faturamento, a quantidade de itens vendidos e o total de pedidos agrupados por categoria.
+
+Requisição:
 
 ```text
 GET /api/relatorios/vendas-por-categoria
@@ -218,7 +391,11 @@ Exemplo de resposta:
 ]
 ```
 
-Exemplo dos cinco produtos mais vendidos:
+#### GET /api/relatorios/top-produtos
+
+Retorna os cinco produtos mais vendidos, com nome, categoria, quantidade vendida e faturamento.
+
+Requisição:
 
 ```text
 GET /api/relatorios/top-produtos
@@ -266,7 +443,11 @@ Exemplo de resposta:
 ]
 ```
 
-Exemplo de faturamento:
+#### GET /api/relatorios/faturamento
+
+Retorna a soma do valor total dos pedidos dentro de um período informado.
+
+Requisição:
 
 ```text
 GET /api/relatorios/faturamento?data_inicio=2026-11-10&data_fim=2026-11-18
@@ -326,7 +507,7 @@ As migrations criam as tabelas:
 - `produtos`
 - `pedidos`
 
-Os seeds inserem dados iniciais para testes, incluindo seis produtos e cinco pedidos.
+Os seeds inserem dados iniciais para testes, incluindo seis produtos e cinco pedidos com datas diferentes.
 
 ## Execução em desenvolvimento
 
