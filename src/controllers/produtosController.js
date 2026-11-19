@@ -12,7 +12,14 @@ async function listarProdutos(req, res) {
             });
         }
 
-        let consulta = db('produtos').select('*');
+       let consulta = db('produtos').select(
+    'id',
+    'nome',
+    'categoria',
+    'preco',
+    'estoque',
+    'ativo'
+);
 
         if (categoria !== undefined) {
             consulta = consulta.where('categoria', categoria);
@@ -231,9 +238,7 @@ async function excluirProduto(req, res) {
             .where({ id })
             .del();
 
-        return res.status(200).json({
-            mensagem: 'Produto excluído com sucesso.'
-        });
+       return res.status(204).send();
 
     } catch (erro) {
         console.error(erro);

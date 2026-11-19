@@ -24,10 +24,18 @@ async function listarPedidos(req, res) {
             });
         }
 
-        let consulta = db('pedidos')
-            .select('*')
-            .limit(limite)
-            .offset(deslocamento);
+       let consulta = db('pedidos')
+    .select(
+        'id',
+        'aluno_nome',
+        'produto_id',
+        'quantidade',
+        'valor_total',
+        'created_at',
+        'updated_at'
+    )
+    .limit(limite)
+    .offset(deslocamento);
 
         if (aluno) {
             consulta = consulta.where('aluno_nome', 'like', `%${aluno}%`);
@@ -174,10 +182,7 @@ async function excluirPedido(req, res) {
                 .del();
         });
 
-        return res.status(200).json({
-            mensagem: 'Pedido excluído e estoque restaurado com sucesso.'
-        });
-
+        return res.status(204).send();
     } catch (erro) {
         console.error(erro);
         return res.status(erro.status || 500).json({
